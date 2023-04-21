@@ -1,6 +1,7 @@
-const {app, BrowserWindow, BrowserView} = require('electron');
+const {app, BrowserWindow, BrowserView, ipcMain } = require('electron');
 const path = require('path');
-
+const keytar = require('keytar');
+const serviceName = 'chat-app';
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -12,6 +13,8 @@ const createWindow = async () => {
     width: 800,
     height: 600,
     webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
     },
   });
@@ -22,22 +25,39 @@ const createWindow = async () => {
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 
-  const browserView = new BrowserView({
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
+  // const browserView = new BrowserView({
+  //   webPreferences: {
+  //     nodeIntegration: false,
+  //     contextIsolation: true,
+  //   },
+  // });
+  // mainWindow.setBrowserView(browserView);
+  await mainWindow.webContents.loadURL('http://54.153.41.210/');
+  // const [width, height] = mainWindow.getSize();
+  // browserView.setBounds({
+  //   x: 0,
+  //   y: 0,
+  //   width: width - 2,
+  //   height: height - 33,
+  // });
+  // browserView.setAutoResize({width: true, height: true});
+  // 保存凭据
+  ipcMain.handle('save-credentials', async (event, account, password) => {
+    console.log("saveCredentials",account,password)
+    let newVar = await keytar.setPassword(serviceName, account, password);
+
+    console.log("saveCredentials",newVar)
   });
-  mainWindow.setBrowserView(browserView);
-  await browserView.webContents.loadURL('http://54.153.41.210/');
-  const [width, height] = mainWindow.getSize();
-  browserView.setBounds({
-    x: 0,
-    y: 0,
-    width: width - 2,
-    height: height - 33,
+
+// 获取凭据
+  ipcMain.handle('get-credentials', async (event, account) => {
+    const password = await keytar.getPassword(serviceName, account);
+    console.log("get-credentials",password)
+    return password;
   });
-  browserView.setAutoResize({width: true, height: true});
+
+  // Open the DevTools.
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

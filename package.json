@@ -27,7 +27,8 @@
   "author": "ubuntu",
   "license": "MIT",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "keytar": "^7.9.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.1.1",
