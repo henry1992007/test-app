@@ -58,7 +58,7 @@ const createWindow = async () => {
   await mainWindow.webContents.loadURL('http://54.153.41.210/');
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
